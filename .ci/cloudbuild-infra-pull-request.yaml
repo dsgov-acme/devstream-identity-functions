@@ -1,0 +1,40 @@
+timeout: 1200s
+logsBucket: "gs://${_ARTIFACT_BUCKET_NAME}/cloudbuild-logs/infra-${_SERVICE_NAME}-pull-request-trigger"
+steps:
+  # Initialize Terraform
+  - id: 'tf init'
+    name: 'hashicorp/terraform:$_TF_VERSION'
+    dir: "${_TF_DIR}"
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "##################"
+        echo "# TERRAFORM INIT #"
+        echo "##################"
+        terraform init || exit 1
+  # Validate Terraform Configuration
+  - id: 'tf validate'
+    name: 'hashicorp/terraform:$_TF_VERSION'
+    dir: "${_TF_DIR}"
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "######################"
+        echo "# TERRAFORM VALIDATE #"
+        echo "######################"
+        terraform fmt --diff --check || exit 3
+        terraform validate || exit 1
+  # Plan Infrastructure
+  - id: 'tf plan'
+    name: 'hashicorp/terraform:$_TF_VERSION'
+    dir: "${_TF_DIR}"
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "##################"
+        echo "# TERRAFORM PLAN #"
+        echo "##################"
+        terraform plan -lock=false -input=false || exit 1

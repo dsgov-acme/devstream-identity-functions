@@ -1,0 +1,62 @@
+timeout: 1200s
+logsBucket: "gs://${_ARTIFACT_BUCKET_NAME}/cloudbuild-logs/infra-${_SERVICE_NAME}-push-request-trigger"
+steps:
+  # Initialize Terraform
+  - id: 'tf init'
+    name: 'hashicorp/terraform:$_TF_VERSION'
+    dir: "${_TF_DIR}"
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "##################"
+        echo "# TERRAFORM INIT #"
+        echo "##################"
+        terraform init || exit 1
+  # Validate Terraform Configuration
+  - id: 'tf validate'
+    name: 'hashicorp/terraform:$_TF_VERSION'
+    dir: "${_TF_DIR}"
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "######################"
+        echo "# TERRAFORM VALIDATE #"
+        echo "######################"
+        terraform fmt --diff --check || exit 3
+        terraform validate || exit 1
+  # Plan Infrastructure
+  - id: 'tf plan'
+    name: 'hashicorp/terraform:$_TF_VERSION'
+    dir: "${_TF_DIR}"
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "##################"
+        echo "# TERRAFORM PLAN #"
+        echo "##################"
+        terraform plan -lock=false -input=false || exit 1
+  # Apply Infrastructure
+  - id: 'tf apply'
+    name: 'gcr.io/cloud-builders/gcloud'
+    dir: "${_TF_DIR}"
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "###################"
+        echo "# TERRAFORM APPLY #"
+        echo "###################"
+        apt update && \
+          apt install wget && \
+          apt install unzip && \
+          ( \
+            cd /tmp; \
+            wget https://releases.hashicorp.com/terraform/$${TF_VERSION}/terraform_$${TF_VERSION}_linux_amd64.zip; \
+            unzip terraform_$${TF_VERSION}_linux_amd64.zip -d /usr/local/bin \
+          ) && \
+          terraform apply -auto-approve || exit 1
+    env:
+      - 'TF_VERSION=$_TF_VERSION'
