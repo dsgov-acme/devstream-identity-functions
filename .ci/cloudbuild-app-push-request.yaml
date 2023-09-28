@@ -1,0 +1,11 @@
+timeout: 1200s
+logsBucket: "gs://${_ARTIFACT_BUCKET_NAME}/cloudbuild-logs/app-${_SERVICE_NAME}-push-request-trigger"
+steps:
+  - id: 'install'
+    name: 'node:$_NODE_VERSION'
+    entrypoint: 'npm'
+    args: ['install']
+  - id: 'build'
+    name: 'node:$_NODE_VERSION'
+    entrypoint: 'npm'
+    args: ['run', 'gcp-build']
