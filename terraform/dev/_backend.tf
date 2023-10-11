@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "devstream-tfstate"
+    bucket = "devstream-1a70-tfstate"
     prefix = "identity-functions/dev"
   }
 }
