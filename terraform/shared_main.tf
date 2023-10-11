@@ -89,7 +89,8 @@ resource "google_cloudfunctions_function_iam_member" "gcip_before_create_invoker
   member = "allUsers"
   depends_on = [
     google_storage_bucket_object.code_archive,
-    google_cloudfunctions_function.gcip_before_create
+    google_cloudfunctions_function.gcip_before_create,
+    google_project_organization_policy.allowed_member_domains,
   ]
   lifecycle {
     replace_triggered_by = [
@@ -143,7 +144,8 @@ resource "google_cloudfunctions_function_iam_member" "gcip_before_signin_invoker
   member = "allUsers"
   depends_on = [
     google_storage_bucket_object.code_archive,
-    google_cloudfunctions_function.gcip_before_signin
+    google_cloudfunctions_function.gcip_before_signin,
+    google_project_organization_policy.allowed_member_domains,
   ]
   lifecycle {
     replace_triggered_by = [
@@ -164,6 +166,7 @@ resource "null_resource" "update-idp-triggers" {
       BEFORE_CREATE_TRIGGER_URL = "${google_cloudfunctions_function.gcip_before_create.https_trigger_url}"
       BEFORE_SIGNIN_TRIGGER_URL = "${google_cloudfunctions_function.gcip_before_signin.https_trigger_url}"
       PROJECT_ID                = "${var.project}"
+      TERRAFORM_SA_EMAIL        = "${local.terraform_sa_email}"
     }
   }
   depends_on = [

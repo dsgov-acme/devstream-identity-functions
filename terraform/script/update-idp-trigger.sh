@@ -5,7 +5,9 @@ set -e
 PROJECT_ID=${PROJECT_ID}
 BEFORE_CREATE_TRIGGER_URL=${BEFORE_CREATE_TRIGGER_URL}
 BEFORE_SIGNIN_TRIGGER_URL=${BEFORE_SIGNIN_TRIGGER_URL}
-AUTH_TOKEN="$(gcloud auth print-access-token)"
+TERRAFORM_SA_EMAIL=${TERRAFORM_SA_EMAIL}
+AUTH_TOKEN="$(gcloud auth print-access-token --impersonate-service-account=${TERRAFORM_SA_EMAIL})"
+
 
 curl -fsSL -d "{\"blockingFunctions\":{\"triggers\":{\"beforeCreate\":{\"functionUri\":\"${BEFORE_CREATE_TRIGGER_URL}\"},\"beforeSignIn\":{\"functionUri\":\"${BEFORE_SIGNIN_TRIGGER_URL}\"}}}}" \
   -X PATCH \
