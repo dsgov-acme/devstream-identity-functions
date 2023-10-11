@@ -15,8 +15,8 @@ data "terraform_remote_state" "env" {
   backend = "gcs"
 
   config = {
-    bucket = "devstream-tfstate"
-    prefix = "${var.environment}"
+    bucket = "devstream-1a70-tfstate"
+    prefix = "environments/${var.environment}"
   }
 }
 
