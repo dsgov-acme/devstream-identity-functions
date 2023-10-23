@@ -65,6 +65,7 @@ resource "google_cloudfunctions_function" "gcip_before_create" {
     AGENCY_TENANT_ID         = split("/", data.terraform_remote_state.env.outputs.agency-portal-id)[3]
     PUBLIC_TENANT_ID         = split("/", data.terraform_remote_state.env.outputs.public-portal-id)[3]
     USER_MANAGEMENT_BASE_URL = var.user_management_base_url
+    JWT_ISSUER               = var.project_prefix
   }
   secret_environment_variables {
     key        = "JWT_PRIVATE_KEY"
@@ -120,6 +121,7 @@ resource "google_cloudfunctions_function" "gcip_before_signin" {
     AGENCY_TENANT_ID         = split("/", data.terraform_remote_state.env.outputs.agency-portal-id)[3]
     PUBLIC_TENANT_ID         = split("/", data.terraform_remote_state.env.outputs.public-portal-id)[3]
     USER_MANAGEMENT_BASE_URL = var.user_management_base_url
+    JWT_ISSUER               = var.project_prefix
   }
   secret_environment_variables {
     key        = "JWT_PRIVATE_KEY"
