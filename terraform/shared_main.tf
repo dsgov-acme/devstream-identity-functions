@@ -117,8 +117,8 @@ resource "google_cloudfunctions_function" "gcip_before_signin" {
   ingress_settings             = "ALLOW_ALL"
   environment_variables = {
     GCP_PROJECT              = var.project
-    AGENCY_TENANT_ID         = data.terraform_remote_state.env.outputs.agency-portal-id
-    PUBLIC_TENANT_ID         = data.terraform_remote_state.env.outputs.public-portal-id
+    AGENCY_TENANT_ID         = split("/", data.terraform_remote_state.env.outputs.agency-portal-id)[3]
+    PUBLIC_TENANT_ID         = split("/", data.terraform_remote_state.env.outputs.public-portal-id)[3]
     USER_MANAGEMENT_BASE_URL = var.user_management_base_url
   }
   secret_environment_variables {
